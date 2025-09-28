@@ -58,48 +58,24 @@ class SklearnEmailClassifier:
         ])
 
     def _load_or_train(self):
-        try:
-            obj = self.store.load()
-            if obj is not None:
-                self.pipe = obj
-                print("Modelo carregado com sucesso")
-                return
-        except Exception as e:
-            print(f"Erro ao carregar modelo: {e}")
-        
-        # treino inicial
-        try:
-            print("Iniciando treinamento do modelo...")
-            X = [t for t, _ in SEED]
-            y = [c.value for _, c in SEED]
-            pipe = self._build()
-            pipe.fit(X, y)
-            self.store.save(pipe)
-            self.pipe = pipe
-            print("Modelo treinado e salvo com sucesso")
-        except Exception as e:
-            print(f"Erro no treinamento: {e}")
-            # Fallback: modelo em memória sem salvar
-            X = [t for t, _ in SEED]
-            y = [c.value for _, c in SEED]
-            pipe = self._build()
-            pipe.fit(X, y)
-            self.pipe = pipe
-            print("Modelo treinado em memória (não salvo)")
+        print("Iniciando treinamento do modelo...")
+        # Sempre treinar em memória para evitar problemas de arquivo
+        X = [t for t, _ in SEED]
+        y = [c.value for _, c in SEED]
+        pipe = self._build()
+        pipe.fit(X, y)
+        self.pipe = pipe
+        print("Modelo treinado em memória com sucesso")
 
     def predict(self, email: Email) -> Tuple[Category, float]:
-        try:
-            print(f"Predicting for: '{email.text[:50]}...'")
-            if self.pipe is None:
-                print("Pipeline is None!")
-                return Category.IMPRODUTIVO, 0.5
-            
-            proba = self.pipe.predict_proba([email.text])[0]
-            classes = self.pipe.classes_
-            idx = proba.argmax()
-            result = Category(classes[idx]), float(proba[idx])
-            print(f"Prediction result: {result}")
-            return result
-        except Exception as e:
-            print(f"Erro na predição: {e}")
+        print(f"Predicting for: '{email.text[:50]}...'")
+        if self.pipe is None:
+            print("Pipeline is None!")
             return Category.IMPRODUTIVO, 0.5
+        
+        proba = self.pipe.predict_proba([email.text])[0]
+        classes = self.pipe.classes_
+        idx = proba.argmax()
+        result = Category(classes[idx]), float(proba[idx])
+        print(f"Prediction result: {result}")
+        return result
