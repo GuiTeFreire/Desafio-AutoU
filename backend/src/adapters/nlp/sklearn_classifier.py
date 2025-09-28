@@ -58,17 +58,34 @@ class SklearnEmailClassifier:
         ])
 
     def _load_or_train(self):
-        obj = self.store.load()
-        if obj is not None:
-            self.pipe = obj
-            return
+        try:
+            obj = self.store.load()
+            if obj is not None:
+                self.pipe = obj
+                print("Modelo carregado com sucesso")
+                return
+        except Exception as e:
+            print(f"Erro ao carregar modelo: {e}")
+        
         # treino inicial
-        X = [t for t, _ in SEED]
-        y = [c.value for _, c in SEED]
-        pipe = self._build()
-        pipe.fit(X, y)
-        self.store.save(pipe)
-        self.pipe = pipe
+        try:
+            print("Iniciando treinamento do modelo...")
+            X = [t for t, _ in SEED]
+            y = [c.value for _, c in SEED]
+            pipe = self._build()
+            pipe.fit(X, y)
+            self.store.save(pipe)
+            self.pipe = pipe
+            print("Modelo treinado e salvo com sucesso")
+        except Exception as e:
+            print(f"Erro no treinamento: {e}")
+            # Fallback: modelo em memória sem salvar
+            X = [t for t, _ in SEED]
+            y = [c.value for _, c in SEED]
+            pipe = self._build()
+            pipe.fit(X, y)
+            self.pipe = pipe
+            print("Modelo treinado em memória (não salvo)")
 
     def predict(self, email: Email) -> Tuple[Category, float]:
         proba = self.pipe.predict_proba([email.text])[0]

@@ -7,7 +7,15 @@ class LocalModelStore:
     def __init__(self, model_dir: str | None = None, model_file: str | None = None):
         self.dir = Path(model_dir or settings.MODEL_DIR)
         self.path = self.dir / (model_file or settings.MODEL_FILE)
-        self.dir.mkdir(exist_ok=True)
+        try:
+            self.dir.mkdir(exist_ok=True)
+        except Exception as e:
+            print(f"Erro ao criar diretório {self.dir}: {e}")
+            # Fallback para diretório temporário
+            import tempfile
+            self.dir = Path(tempfile.gettempdir()) / "model_artifacts"
+            self.path = self.dir / (model_file or settings.MODEL_FILE)
+            self.dir.mkdir(exist_ok=True)
 
     def save(self, obj: Any) -> None:
         with open(self.path, "wb") as f:
