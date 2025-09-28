@@ -5,7 +5,7 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: python main.py
+    startCommand: uvicorn src.interfaces.api.app_factory:create_app --host 0.0.0.0 --port $PORT --factory
     envVars:
       - key: ENV
         value: prod
