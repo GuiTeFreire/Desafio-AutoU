@@ -137,7 +137,7 @@ export const EmailUpload = ({ onProcess, isLoading, onReset, onLoadingChange }: 
     <div className="space-y-6">
       {!file ? (
         <Card
-          className={`p-8 border-2 border-dashed transition-all duration-300 cursor-pointer ${
+          className={`p-8 border-2 border-dashed transition-all duration-300 ${
             dragActive 
               ? 'border-primary bg-primary/5 shadow-glow' 
               : 'border-card-border hover:border-primary/50 hover:bg-primary/5'
@@ -146,7 +146,6 @@ export const EmailUpload = ({ onProcess, isLoading, onReset, onLoadingChange }: 
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
-          onClick={() => document.getElementById('file-upload')?.click()}
         >
           <div className="text-center">
             <div className="mb-4 flex justify-center">
@@ -170,8 +169,8 @@ export const EmailUpload = ({ onProcess, isLoading, onReset, onLoadingChange }: 
               className="hidden"
               id="file-upload"
             />
-            <label htmlFor="file-upload">
-              <Button variant="outline" className="cursor-pointer" asChild>
+            <label htmlFor="file-upload" className="cursor-pointer">
+              <Button variant="outline" asChild>
                 <span>Selecionar Arquivo</span>
               </Button>
             </label>
