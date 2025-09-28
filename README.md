@@ -22,7 +22,7 @@ graph TB
         C --> D
         D --> E[ClassificationResult Component]
     end
-    
+
     subgraph "Backend (FastAPI + Python)"
         F[API Routes] --> G[Email Classification Use Case]
         G --> H[Sklearn Classifier]
@@ -31,17 +31,17 @@ graph TB
         I --> K[Gemini API]
         I --> L[Template Engine]
     end
-    
+
     subgraph "Infraestrutura"
         M[Render - Backend] --> N[Python Runtime]
         O[Render - Frontend] --> P[Static Site]
         Q[Model Artifacts] --> R[Pickle Files]
     end
-    
+
     D -->|HTTP/HTTPS| F
     H --> Q
     J --> Q
-    
+
     style A fill:#e1f5fe
     style F fill:#f3e5f5
     style M fill:#e8f5e8
@@ -81,6 +81,7 @@ AutoU/
 ## 🛠️ Tecnologias Utilizadas
 
 ### Backend
+
 - **FastAPI**: Framework web moderno e rápido
 - **Scikit-learn**: Machine Learning para classificação
 - **Google Gemini**: API de IA para geração de respostas
@@ -88,6 +89,7 @@ AutoU/
 - **Uvicorn**: Servidor ASGI
 
 ### Frontend
+
 - **React 18**: Biblioteca para interfaces
 - **TypeScript**: Tipagem estática
 - **Vite**: Build tool moderno
@@ -96,6 +98,7 @@ AutoU/
 - **Lucide React**: Ícones
 
 ### Infraestrutura
+
 - **Render**: Plataforma de deploy
 - **GitHub**: Controle de versão
 - **Python 3.11+**: Runtime backend
@@ -104,6 +107,7 @@ AutoU/
 ## 🚀 Como Executar Localmente
 
 ### Pré-requisitos
+
 - Python 3.11+
 - Node.js 18+
 - npm ou yarn
@@ -111,12 +115,14 @@ AutoU/
 ### Backend
 
 1. **Clone o repositório:**
+
 ```bash
 git clone <repository-url>
 cd AutoU/backend
 ```
 
 2. **Crie um ambiente virtual:**
+
 ```bash
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
@@ -125,11 +131,13 @@ venv\Scripts\activate     # Windows
 ```
 
 3. **Instale as dependências:**
+
 ```bash
 pip install -r requirements.txt
 ```
 
 4. **Execute o servidor:**
+
 ```bash
 python main.py
 ```
@@ -139,16 +147,19 @@ O backend estará disponível em: http://localhost:8000
 ### Frontend
 
 1. **Navegue para o diretório frontend:**
+
 ```bash
 cd ../frontend
 ```
 
 2. **Instale as dependências:**
+
 ```bash
 npm install
 ```
 
 3. **Execute o servidor de desenvolvimento:**
+
 ```bash
 npm run dev
 ```
@@ -158,6 +169,7 @@ O frontend estará disponível em: http://localhost:8080
 ## 📡 API Endpoints
 
 ### Classificação de Email
+
 ```http
 POST /api/process_email
 Content-Type: multipart/form-data
@@ -168,6 +180,7 @@ Content-Type: multipart/form-data
 ```
 
 **Resposta:**
+
 ```json
 {
   "category": "Produtivo",
@@ -179,11 +192,13 @@ Content-Type: multipart/form-data
 ```
 
 ### Health Check
+
 ```http
 GET /health
 ```
 
 **Resposta:**
+
 ```json
 {
   "status": "ok"
@@ -195,10 +210,12 @@ GET /health
 1. **Acesse a aplicação:** https://desafio-autou-up1n.onrender.com
 
 2. **Escolha o método de entrada:**
+
    - **Upload de Arquivo**: Arraste e solte ou clique para selecionar arquivos .txt ou .pdf
    - **Inserção Manual**: Digite ou cole o conteúdo do email
 
 3. **Processe o email:**
+
    - Clique em "Classificar Email"
    - Aguarde o processamento (indicador de loading)
 
@@ -213,6 +230,7 @@ GET /health
 ### Variáveis de Ambiente
 
 **Backend:**
+
 ```env
 ENV=prod
 AI_PROVIDER=template  # ou gemini
@@ -220,6 +238,7 @@ GEMINI_API_KEY=sua_chave_aqui  # opcional
 ```
 
 **Frontend:**
+
 ```env
 VITE_API_URL=https://desafio-autou-back-fxvg.onrender.com
 ```
@@ -229,6 +248,7 @@ VITE_API_URL=https://desafio-autou-back-fxvg.onrender.com
 O sistema classifica emails baseado em:
 
 **Emails Produtivos:**
+
 - Solicitações de suporte
 - Problemas técnicos
 - Pedidos de informação
@@ -236,6 +256,7 @@ O sistema classifica emails baseado em:
 - Relatórios e documentação
 
 **Emails Improdutivos:**
+
 - Mensagens sociais
 - Cumprimentos e felicitações
 - Conteúdo ofensivo
@@ -252,6 +273,7 @@ O projeto está configurado para deploy automático no Render:
 3. **Deploy automático** a cada commit na branch `main`
 
 **URLs de Produção:**
+
 - Frontend: https://desafio-autou-up1n.onrender.com
 - Backend: https://desafio-autou-back-fxvg.onrender.com
 - API Docs: https://desafio-autou-back-fxvg.onrender.com/docs
@@ -278,6 +300,7 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 ## 📞 Suporte
 
 Para suporte ou dúvidas:
+
 - Abra uma issue no GitHub
 - Consulte a documentação da API: https://desafio-autou-back-fxvg.onrender.com/docs
 
