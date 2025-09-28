@@ -4,12 +4,15 @@ Sistema inteligente de classificação automática de emails que utiliza Machine
 
 ## 🚀 Funcionalidades
 
-- **Classificação Automática**: Identifica se um email é produtivo ou improdutivo
-- **Respostas Inteligentes**: Gera sugestões de resposta usando IA (Gemini)
-- **Upload de Arquivos**: Suporte para arquivos .txt e .pdf
-- **Interface Moderna**: Interface React responsiva e intuitiva
-- **API RESTful**: Backend FastAPI com documentação automática
-- **Deploy Automático**: Configuração para Render com deploy contínuo
+- **Upload de arquivos**: Suporte para arquivos .txt e .pdf
+- **Dropzone de arquivo**: Possibilidade de upload a partir de arrastar e soltar arquivo
+- **Remoção arquivo uploadado**: Possibilidade de remover o arquivo anteriormente uploadado
+- **Inserção de texto manual**: Suporte inserção de textp manual
+- **Limpeza da caixa de texto**: Possibilidade de limpar o e-mail rascunhado
+- **Classificação automática**: Identifica se um email é produtivo ou improdutivo
+- **Nível de confiança**: Exibe nível de confiança da classificação do e-mail
+- **Sugestão de resposta**: Gera sugestões de resposta usando IA (Gemini)
+- **Cópia de resposta sugerida**: Possibilidade de copiar resposta sugerida
 
 ## 🏗️ Arquitetura do Sistema
 
@@ -82,7 +85,7 @@ AutoU/
 
 ### Backend
 
-- **FastAPI**: Framework web moderno e rápido
+- **FastAPI**: Framework web para API's
 - **Scikit-learn**: Machine Learning para classificação
 - **Google Gemini**: API de IA para geração de respostas
 - **Pydantic**: Validação de dados
@@ -92,8 +95,8 @@ AutoU/
 
 - **React 18**: Biblioteca para interfaces
 - **TypeScript**: Tipagem estática
-- **Vite**: Build tool moderno
-- **Tailwind CSS**: Framework CSS utilitário
+- **Vite**: Build tool
+- **Tailwind CSS**: Framework CSS
 - **Shadcn/ui**: Componentes de interface
 - **Lucide React**: Ícones
 
@@ -223,7 +226,6 @@ GET /health
    - **Categoria**: Produtivo ou Improdutivo
    - **Confiança**: Percentual de certeza da classificação
    - **Resposta Sugerida**: Texto gerado pela IA
-   - **Fonte**: Classificador e gerador utilizados
 
 ## 🔧 Configuração
 
@@ -262,48 +264,8 @@ O sistema classifica emails baseado em:
 - Conteúdo ofensivo
 - Conversas informais
 
-## 🚀 Deploy
-
-### Render (Automático)
-
-O projeto está configurado para deploy automático no Render:
-
-1. **Conecte o repositório** no dashboard do Render
-2. **Configure as variáveis de ambiente**
-3. **Deploy automático** a cada commit na branch `main`
-
 **URLs de Produção:**
 
 - Frontend: https://desafio-autou-up1n.onrender.com
 - Backend: https://desafio-autou-back-fxvg.onrender.com
 - API Docs: https://desafio-autou-back-fxvg.onrender.com/docs
-
-## 📊 Monitoramento
-
-- **Health Checks**: Verificação automática de saúde
-- **Logs**: Disponíveis no dashboard do Render
-- **Métricas**: Performance e uso de recursos
-- **Alertas**: Notificações de downtime
-
-## 🤝 Contribuição
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
-## 📝 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
-
-## 📞 Suporte
-
-Para suporte ou dúvidas:
-
-- Abra uma issue no GitHub
-- Consulte a documentação da API: https://desafio-autou-back-fxvg.onrender.com/docs
-
----
-
-**AutoU** - Classificação inteligente de emails com IA 🚀
