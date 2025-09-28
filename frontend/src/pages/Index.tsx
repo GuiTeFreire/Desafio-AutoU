@@ -50,7 +50,7 @@ const Index = () => {
           <Card className="gradient-card border-card-border shadow-lg">
             <div className="p-8">
               <h2 className="text-3xl font-bold mb-8 text-center">
-                Processe seu Email
+                Classifique seu Email
               </h2>
               
               <Tabs defaultValue="upload" className="w-full">
