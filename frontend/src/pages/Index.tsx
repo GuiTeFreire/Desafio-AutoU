@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { EmailUpload, EmailUploadRef } from "@/components/EmailUpload";
-import { EmailInput } from "@/components/EmailInput";
+import { EmailInput, EmailInputRef } from "@/components/EmailInput";
 import { ClassificationResult } from "@/components/ClassificationResult";
 import { Header } from "@/components/Header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,6 +20,7 @@ const Index = () => {
   const [classificationResult, setClassificationResult] = useState<ClassificationData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const emailUploadRef = useRef<EmailUploadRef>(null);
+  const emailInputRef = useRef<EmailInputRef>(null);
 
   const handleEmailProcess = (result: ClassificationData) => {
     setClassificationResult(result);
@@ -29,6 +30,8 @@ const Index = () => {
     setClassificationResult(null);
     // Limpar arquivo se estiver na aba upload
     emailUploadRef.current?.clearFile?.();
+    // Limpar conteúdo se estiver na aba texto
+    emailInputRef.current?.clearContent?.();
   };
 
   const clearFile = () => {
@@ -78,6 +81,7 @@ const Index = () => {
                 
                 <TabsContent value="text" className="space-y-6">
                   <EmailInput 
+                    ref={emailInputRef}
                     onProcess={handleEmailProcess}
                     isLoading={isLoading}
                     onReset={resetResults}

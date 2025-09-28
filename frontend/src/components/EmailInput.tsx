@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef, useImperativeHandle } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,7 +23,12 @@ interface EmailInputProps {
   onLoadingChange: (loading: boolean) => void;
 }
 
-export const EmailInput = ({ onProcess, isLoading, onReset, onLoadingChange }: EmailInputProps) => {
+export interface EmailInputRef {
+  clearContent: () => void;
+}
+
+export const EmailInput = forwardRef<EmailInputRef, EmailInputProps>(
+  ({ onProcess, isLoading, onReset, onLoadingChange }, ref) => {
   const [content, setContent] = useState("");
   const [subject, setSubject] = useState("");
   const { toast } = useToast();
@@ -59,6 +64,15 @@ export const EmailInput = ({ onProcess, isLoading, onReset, onLoadingChange }: E
     setSubject("");
     onReset();
   };
+
+  const clearContent = () => {
+    setContent("");
+    setSubject("");
+  };
+
+  useImperativeHandle(ref, () => ({
+    clearContent
+  }));
 
   return (
     <div className="space-y-6">
@@ -122,4 +136,4 @@ export const EmailInput = ({ onProcess, isLoading, onReset, onLoadingChange }: E
       </Card>
     </div>
   );
-};
+});
