@@ -88,7 +88,18 @@ class SklearnEmailClassifier:
             print("Modelo treinado em memória (não salvo)")
 
     def predict(self, email: Email) -> Tuple[Category, float]:
-        proba = self.pipe.predict_proba([email.text])[0]
-        classes = self.pipe.classes_
-        idx = proba.argmax()
-        return Category(classes[idx]), float(proba[idx])
+        try:
+            print(f"Predicting for: '{email.text[:50]}...'")
+            if self.pipe is None:
+                print("Pipeline is None!")
+                return Category.IMPRODUTIVO, 0.5
+            
+            proba = self.pipe.predict_proba([email.text])[0]
+            classes = self.pipe.classes_
+            idx = proba.argmax()
+            result = Category(classes[idx]), float(proba[idx])
+            print(f"Prediction result: {result}")
+            return result
+        except Exception as e:
+            print(f"Erro na predição: {e}")
+            return Category.IMPRODUTIVO, 0.5

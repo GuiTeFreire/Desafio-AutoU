@@ -62,6 +62,8 @@ class ClassifyEmailUseCase:
             )
         except Exception as e:
             print(f"Erro no processamento: {e}")
+            import traceback
+            traceback.print_exc()
             # Fallback em caso de erro
             return ClassifyEmailOutput(
                 category="Improdutivo",

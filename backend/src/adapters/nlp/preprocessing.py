@@ -13,9 +13,15 @@ def clean_text(text: str) -> str:
     return text
 
 def preprocess(text: str) -> str:
-    text = clean_text(text).lower()
-    tokens = [t for t in text.split() if t not in STOPWORDS_PT]
-    return " ".join(tokens)
+    try:
+        text = clean_text(text).lower()
+        tokens = [t for t in text.split() if t not in STOPWORDS_PT]
+        result = " ".join(tokens)
+        print(f"Preprocessing: '{text[:50]}...' -> '{result[:50]}...'")
+        return result
+    except Exception as e:
+        print(f"Erro no preprocessing: {e}")
+        return text.lower() if text else ""
 
 BAD_WORDS = {
     "arrombado","idiota","imbecil","merda","lixo","odiar","te odeio",
