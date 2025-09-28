@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { EmailUpload } from "@/components/EmailUpload";
+import { EmailUpload, EmailUploadRef } from "@/components/EmailUpload";
 import { EmailInput } from "@/components/EmailInput";
 import { ClassificationResult } from "@/components/ClassificationResult";
 import { Header } from "@/components/Header";
@@ -19,6 +19,7 @@ interface ClassificationData {
 const Index = () => {
   const [classificationResult, setClassificationResult] = useState<ClassificationData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const emailUploadRef = useRef<EmailUploadRef>(null);
 
   const handleEmailProcess = (result: ClassificationData) => {
     setClassificationResult(result);
@@ -26,6 +27,12 @@ const Index = () => {
 
   const resetResults = () => {
     setClassificationResult(null);
+    // Limpar arquivo se estiver na aba upload
+    emailUploadRef.current?.clearFile?.();
+  };
+
+  const clearFile = () => {
+    // Esta função será chamada pelo EmailUpload para limpar o arquivo
   };
 
   const handleLoadingChange = (loading: boolean) => {
@@ -60,10 +67,12 @@ const Index = () => {
                 
                 <TabsContent value="upload" className="space-y-6">
                   <EmailUpload 
+                    ref={emailUploadRef}
                     onProcess={handleEmailProcess}
                     isLoading={isLoading}
                     onReset={resetResults}
                     onLoadingChange={handleLoadingChange}
+                    onClearFile={clearFile}
                   />
                 </TabsContent>
                 

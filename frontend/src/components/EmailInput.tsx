@@ -60,26 +60,6 @@ export const EmailInput = ({ onProcess, isLoading, onReset, onLoadingChange }: E
     onReset();
   };
 
-  const exampleEmails = [
-    {
-      subject: "Solicitação de Suporte Técnico",
-      content: "Prezados, estou enfrentando problemas com o sistema de pagamentos desde ontem. Quando tento processar uma transação, aparece um erro 500. Preciso de ajuda urgente pois isso está impactando nossas operações."
-    },
-    {
-      subject: "Feliz Aniversário!",
-      content: "Oi pessoal! Hoje é meu aniversário e queria agradecer a todos pela parceria durante o ano. Vamos almoçar juntos na próxima semana para comemorar!"
-    },
-    {
-      subject: "Status do Projeto ABC",
-      content: "Boa tarde equipe, gostaria de uma atualização sobre o andamento do projeto ABC. Quais são os próximos passos e há algum impedimento que precisa ser resolvido?"
-    }
-  ];
-
-  const fillExample = (example: typeof exampleEmails[0]) => {
-    setSubject(example.subject);
-    setContent(example.content);
-  };
-
   return (
     <div className="space-y-6">
       <Card className="p-6 gradient-card border-card-border">
@@ -138,28 +118,6 @@ export const EmailInput = ({ onProcess, isLoading, onReset, onLoadingChange }: E
               Limpar
             </Button>
           </div>
-        </div>
-      </Card>
-
-      <Card className="p-6 border-card-border">
-        <h4 className="font-medium mb-4 text-muted-foreground">Exemplos:</h4>
-        <div className="grid gap-3">
-          {exampleEmails.map((example, index) => (
-            <Button
-              key={index}
-              variant="ghost"
-              className="justify-start h-auto p-3 text-left"
-              onClick={() => fillExample(example)}
-              disabled={isLoading}
-            >
-              <div>
-                <div className="font-medium text-sm">{example.subject}</div>
-                <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                  {example.content.substring(0, 80)}...
-                </div>
-              </div>
-            </Button>
-          ))}
         </div>
       </Card>
     </div>

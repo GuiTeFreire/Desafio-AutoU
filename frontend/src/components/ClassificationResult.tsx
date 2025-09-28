@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle, AlertTriangle, Copy, RotateCcw, TrendingUp, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 interface ClassificationData {
   category: string;
@@ -21,6 +22,8 @@ interface ClassificationResultProps {
 
 export const ClassificationResult = ({ result, onReset }: ClassificationResultProps) => {
   const { toast } = useToast();
+  const [file, setFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const copyResponse = () => {
     navigator.clipboard.writeText(result.suggested_reply);
@@ -30,16 +33,14 @@ export const ClassificationResult = ({ result, onReset }: ClassificationResultPr
     });
   };
 
-  const copyOriginal = () => {
-    navigator.clipboard.writeText(result.originalContent);
-    toast({
-      title: "Conteúdo copiado!",
-      description: "O conteúdo original foi copiado para a área de transferência.",
-    });
-  };
-
   const isProductive = result.category === 'Produtivo';
   const confidencePercentage = Math.round(result.confidence * 100);
+
+  const removeFile = () => {
+    setFile(null);
+    setUploadProgress(0);
+    onReset();
+  };
 
   return (
     <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
@@ -123,40 +124,12 @@ export const ClassificationResult = ({ result, onReset }: ClassificationResultPr
         </div>
       </Card>
 
-      <Card className="p-6 border-card-border">
-        <div className="flex items-center justify-between mb-4">
-          <h4 className="text-lg font-semibold text-muted-foreground">Conteúdo Original</h4>
-          <Button onClick={copyOriginal} variant="ghost" size="sm">
-            <Copy className="w-4 h-4 mr-2" />
-            Copiar
-          </Button>
-        </div>
-        
-        <div className="bg-muted/30 rounded-lg p-4 max-h-40 overflow-y-auto">
-          <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-            {result.originalContent}
-          </p>
-        </div>
-      </Card>
-
       <div className="flex justify-center pt-4">
         <Button onClick={onReset} variant="outline" size="lg">
           <RotateCcw className="w-4 h-4 mr-2" />
           Processar Novo Email
         </Button>
       </div>
-
-      <Separator />
-
-      <Card className="p-6 bg-primary/5 border-primary/20">
-        <h4 className="font-semibold mb-3 text-primary">💡 Dicas de Uso</h4>
-        <ul className="text-sm text-muted-foreground space-y-2">
-          <li>• Emails produtivos geralmente contêm solicitações, problemas ou pedidos de informação</li>
-          <li>• Emails improdutivos incluem felicitações, mensagens sociais ou conteúdo não relacionado ao trabalho</li>
-          <li>• As respostas sugeridas podem ser personalizadas antes do envio</li>
-          <li>• A confiança da classificação indica a certeza do modelo de IA</li>
-        </ul>
-      </Card>
     </div>
   );
 };

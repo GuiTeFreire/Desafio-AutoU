@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, forwardRef, useImperativeHandle } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -20,9 +20,15 @@ interface EmailUploadProps {
   isLoading: boolean;
   onReset: () => void;
   onLoadingChange: (loading: boolean) => void;
+  onClearFile?: () => void;
 }
 
-export const EmailUpload = ({ onProcess, isLoading, onReset, onLoadingChange }: EmailUploadProps) => {
+export interface EmailUploadRef {
+  clearFile: () => void;
+}
+
+export const EmailUpload = forwardRef<EmailUploadRef, EmailUploadProps>(
+  ({ onProcess, isLoading, onReset, onLoadingChange, onClearFile }, ref) => {
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -131,7 +137,17 @@ export const EmailUpload = ({ onProcess, isLoading, onReset, onLoadingChange }: 
     setFile(null);
     setUploadProgress(0);
     onReset();
+    onClearFile?.();
   };
+
+  const clearFile = () => {
+    setFile(null);
+    setUploadProgress(0);
+  };
+
+  useImperativeHandle(ref, () => ({
+    clearFile
+  }));
 
   return (
     <div className="space-y-6">
@@ -223,4 +239,4 @@ export const EmailUpload = ({ onProcess, isLoading, onReset, onLoadingChange }: 
       )}
     </div>
   );
-};
+});
