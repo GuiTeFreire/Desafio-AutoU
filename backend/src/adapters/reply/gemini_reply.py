@@ -75,6 +75,7 @@ def _gemini_model() -> GenerativeModel:
 
 class GeminiReplyGenerator:
     def __init__(self):
+        print("GeminiReplyGenerator sendo inicializado")
         self._model = None
 
     def _model_instance(self) -> GenerativeModel:
@@ -83,6 +84,7 @@ class GeminiReplyGenerator:
         return self._model
 
     def generate(self, category: str, original_text: str) -> str:
+        print(f"GeminiReplyGenerator.generate chamado com category: {category}")
         prompt = (
             "Você é um assistente de atendimento de uma empresa do setor financeiro.\n"
             f"Classificação do email: {category}.\n"

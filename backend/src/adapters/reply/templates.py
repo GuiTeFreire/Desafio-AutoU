@@ -26,7 +26,7 @@ TEMPLATES = {
 
 class TemplateReplyGenerator:
     def generate(self, category: str, original_text: str) -> str:
-        print("Chegando aqui")
+        print(f"TemplateReplyGenerator.generate chamado com category: {category}")
         if category == Category.IMPRODUTIVO.value:
             # checa tóxico primeiro
             if is_toxic(original_text):
