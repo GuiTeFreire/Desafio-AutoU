@@ -1,0 +1,27 @@
+services:
+  # Backend API
+  - type: web
+    name: desafio-autou-back
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: ENV
+        value: prod
+      - key: AI_PROVIDER
+        value: template
+      - key: GEMINI_API_KEY
+        sync: false
+    healthCheckPath: /health
+
+  # Frontend
+  - type: web
+    name: desafio-autou
+    env: static
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://desafio-autou-back-fxvg.onrender.com

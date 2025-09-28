@@ -10,16 +10,39 @@ from src.adapters.nlp.preprocessing import preprocess
 
 # dataset semente para inicializar
 SEED = [
+    # Emails produtivos - solicitações, problemas, suporte
     ("Preciso de atualização do chamado", Category.PRODUTIVO),
     ("Poderiam resetar minha senha", Category.PRODUTIVO),
-    ("Segue em anexo o relatório solicitado.", Category.PRODUTIVO),
+    ("Segue em anexo o relatório solicitado", Category.PRODUTIVO),
+    ("Estou enfrentando problemas com o sistema", Category.PRODUTIVO),
+    ("Preciso de ajuda urgente", Category.PRODUTIVO),
+    ("Solicitação de suporte técnico", Category.PRODUTIVO),
+    ("Problema com pagamentos", Category.PRODUTIVO),
+    ("Erro no sistema de login", Category.PRODUTIVO),
+    ("Status do projeto", Category.PRODUTIVO),
+    ("Relatório mensal", Category.PRODUTIVO),
+    ("Problema com transação", Category.PRODUTIVO),
+    ("Solicitação de informações", Category.PRODUTIVO),
+    ("Bug no aplicativo", Category.PRODUTIVO),
+    ("Atualização de dados", Category.PRODUTIVO),
+    ("Consulta sobre faturamento", Category.PRODUTIVO),
+    
+    # Emails improdutivos - sociais, ofensivos, não relacionados
     ("eu te odeio", Category.IMPRODUTIVO),
-    ("seu atendimento é uma merda", Category.IMPRODUTIVO),
+    ("seu atendimento é uma porcaria", Category.IMPRODUTIVO),
     ("vocês são uns idiotas", Category.IMPRODUTIVO),
     ("vai se ferrar", Category.IMPRODUTIVO),
     ("lixo de empresa", Category.IMPRODUTIVO),
     ("obrigado!", Category.IMPRODUTIVO),
     ("feliz natal", Category.IMPRODUTIVO),
+    ("feliz aniversário", Category.IMPRODUTIVO),
+    ("bom dia pessoal", Category.IMPRODUTIVO),
+    ("como vocês estão", Category.IMPRODUTIVO),
+    ("parabéns pelo trabalho", Category.IMPRODUTIVO),
+    ("vamos almoçar juntos", Category.IMPRODUTIVO),
+    ("fim de semana bom", Category.IMPRODUTIVO),
+    ("conversa de corredor", Category.IMPRODUTIVO),
+    ("mensagem de cumprimento", Category.IMPRODUTIVO),
 ]
 
 class SklearnEmailClassifier:

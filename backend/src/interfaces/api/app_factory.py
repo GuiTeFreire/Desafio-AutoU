@@ -1,4 +1,3 @@
-# src/interfaces/api/app_factory.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,7 +6,6 @@ from src.adapters.persistence.local_model_store import LocalModelStore
 from src.adapters.nlp.sklearn_classifier import SklearnEmailClassifier
 from src.adapters.reply.templates import TemplateReplyGenerator
 
-# importe a classe recém-criada
 from src.adapters.reply.gemini_reply import GeminiReplyGenerator
 
 from src.interfaces.api.routes.email_routes import router
@@ -16,9 +14,18 @@ from src.use_cases.classify_email import ClassifyEmailUseCase
 def create_app() -> FastAPI:
     app = FastAPI(title="Email Classifier API", version="0.1.0")
 
+    import os
+    
+    allowed_origins = ["*"]
+    if os.getenv("ENV") == "prod":
+        allowed_origins = [
+            "https://desafio-autou-up1n.onrender.com",
+            "https://desafio-autou.onrender.com"
+        ]
+    
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=allowed_origins,
         allow_methods=["*"],
         allow_headers=["*"],
     )

@@ -5,12 +5,14 @@ import { EmailInput } from "@/components/EmailInput";
 import { ClassificationResult } from "@/components/ClassificationResult";
 import { Header } from "@/components/Header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, FileText, Zap, TrendingUp } from "lucide-react";
+import { Mail, FileText } from "lucide-react";
 
 interface ClassificationData {
-  category: 'productive' | 'unproductive';
+  category: string;
   confidence: number;
-  suggestedResponse: string;
+  suggested_reply: string;
+  classify_source: string;
+  reply_source?: string;
   originalContent: string;
 }
 
@@ -18,35 +20,16 @@ const Index = () => {
   const [classificationResult, setClassificationResult] = useState<ClassificationData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleEmailProcess = async (content: string, source: string) => {
-    setIsLoading(true);
-    
-    // Simulate AI processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Mock classification logic
-    const isProductive = content.toLowerCase().includes('suporte') || 
-                        content.toLowerCase().includes('solicitação') ||
-                        content.toLowerCase().includes('problema') ||
-                        content.toLowerCase().includes('urgente') ||
-                        content.toLowerCase().includes('status') ||
-                        content.toLowerCase().includes('andamento');
-    
-    const mockResult: ClassificationData = {
-      category: isProductive ? 'productive' : 'unproductive',
-      confidence: Math.random() * 0.3 + 0.7, // 70-100%
-      suggestedResponse: isProductive 
-        ? "Obrigado pelo seu contato. Recebemos sua solicitação e nossa equipe irá analisá-la em breve. Você receberá uma resposta em até 24 horas úteis com o status atualizado."
-        : "Obrigado pela sua mensagem. Ficamos felizes em receber seu contato e desejamos tudo de bom para você também!",
-      originalContent: content
-    };
-    
-    setClassificationResult(mockResult);
-    setIsLoading(false);
+  const handleEmailProcess = (result: ClassificationData) => {
+    setClassificationResult(result);
   };
 
   const resetResults = () => {
     setClassificationResult(null);
+  };
+
+  const handleLoadingChange = (loading: boolean) => {
+    setIsLoading(loading);
   };
 
   return (
@@ -80,6 +63,7 @@ const Index = () => {
                     onProcess={handleEmailProcess}
                     isLoading={isLoading}
                     onReset={resetResults}
+                    onLoadingChange={handleLoadingChange}
                   />
                 </TabsContent>
                 
@@ -88,11 +72,23 @@ const Index = () => {
                     onProcess={handleEmailProcess}
                     isLoading={isLoading}
                     onReset={resetResults}
+                    onLoadingChange={handleLoadingChange}
                   />
                 </TabsContent>
               </Tabs>
               
-              {classificationResult && (
+              {isLoading && (
+                <div className="mt-8">
+                  <Card className="p-8 text-center">
+                    <div className="flex flex-col items-center space-y-4">
+                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      <p className="text-muted-foreground">Processando email...</p>
+                    </div>
+                  </Card>
+                </div>
+              )}
+              
+              {classificationResult && !isLoading && (
                 <div className="mt-8">
                   <ClassificationResult 
                     result={classificationResult}

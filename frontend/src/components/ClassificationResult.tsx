@@ -6,9 +6,11 @@ import { CheckCircle, AlertTriangle, Copy, RotateCcw, TrendingUp, Mail } from "l
 import { useToast } from "@/hooks/use-toast";
 
 interface ClassificationData {
-  category: 'productive' | 'unproductive';
+  category: string;
   confidence: number;
-  suggestedResponse: string;
+  suggested_reply: string;
+  classify_source: string;
+  reply_source?: string;
   originalContent: string;
 }
 
@@ -21,7 +23,7 @@ export const ClassificationResult = ({ result, onReset }: ClassificationResultPr
   const { toast } = useToast();
 
   const copyResponse = () => {
-    navigator.clipboard.writeText(result.suggestedResponse);
+    navigator.clipboard.writeText(result.suggested_reply);
     toast({
       title: "Resposta copiada!",
       description: "A resposta sugerida foi copiada para a área de transferência.",
@@ -36,7 +38,7 @@ export const ClassificationResult = ({ result, onReset }: ClassificationResultPr
     });
   };
 
-  const isProductive = result.category === 'productive';
+  const isProductive = result.category === 'Produtivo';
   const confidencePercentage = Math.round(result.confidence * 100);
 
   return (
@@ -46,7 +48,6 @@ export const ClassificationResult = ({ result, onReset }: ClassificationResultPr
         <p className="text-muted-foreground">Análise realizada com sucesso pela IA</p>
       </div>
 
-      {/* Classification Result */}
       <Card className="p-6 gradient-card border-card-border">
         <div className="flex items-center gap-4 mb-6">
           <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
@@ -102,7 +103,6 @@ export const ClassificationResult = ({ result, onReset }: ClassificationResultPr
         </div>
       </Card>
 
-      {/* Suggested Response */}
       <Card className="p-6 border-card-border">
         <div className="flex items-center gap-2 mb-4">
           <Mail className="w-5 h-5 text-primary" />
@@ -111,7 +111,7 @@ export const ClassificationResult = ({ result, onReset }: ClassificationResultPr
         
         <div className="bg-muted/50 rounded-lg p-4 mb-4">
           <p className="text-sm leading-relaxed whitespace-pre-wrap">
-            {result.suggestedResponse}
+            {result.suggested_reply}
           </p>
         </div>
         
@@ -123,7 +123,6 @@ export const ClassificationResult = ({ result, onReset }: ClassificationResultPr
         </div>
       </Card>
 
-      {/* Original Content */}
       <Card className="p-6 border-card-border">
         <div className="flex items-center justify-between mb-4">
           <h4 className="text-lg font-semibold text-muted-foreground">Conteúdo Original</h4>
@@ -140,7 +139,6 @@ export const ClassificationResult = ({ result, onReset }: ClassificationResultPr
         </div>
       </Card>
 
-      {/* Actions */}
       <div className="flex justify-center pt-4">
         <Button onClick={onReset} variant="outline" size="lg">
           <RotateCcw className="w-4 h-4 mr-2" />
@@ -150,7 +148,6 @@ export const ClassificationResult = ({ result, onReset }: ClassificationResultPr
 
       <Separator />
 
-      {/* Tips */}
       <Card className="p-6 bg-primary/5 border-primary/20">
         <h4 className="font-semibold mb-3 text-primary">💡 Dicas de Uso</h4>
         <ul className="text-sm text-muted-foreground space-y-2">

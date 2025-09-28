@@ -4,25 +4,54 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, MessageSquare, RotateCcw } from "lucide-react";
+import { ApiService } from "@/services/api";
+import { useToast } from "@/hooks/use-toast";
 
-interface EmailInputProps {
-  onProcess: (content: string, source: string) => void;
-  isLoading: boolean;
-  onReset: () => void;
+interface ClassificationData {
+  category: string;
+  confidence: number;
+  suggested_reply: string;
+  classify_source: string;
+  reply_source?: string;
+  originalContent: string;
 }
 
-export const EmailInput = ({ onProcess, isLoading, onReset }: EmailInputProps) => {
+interface EmailInputProps {
+  onProcess: (result: ClassificationData) => void;
+  isLoading: boolean;
+  onReset: () => void;
+  onLoadingChange: (loading: boolean) => void;
+}
+
+export const EmailInput = ({ onProcess, isLoading, onReset, onLoadingChange }: EmailInputProps) => {
   const [content, setContent] = useState("");
   const [subject, setSubject] = useState("");
+  const { toast } = useToast();
 
-  const handleProcess = () => {
+  const handleProcess = async () => {
     if (!content.trim()) return;
     
     const fullContent = subject.trim() 
       ? `Assunto: ${subject}\n\n${content}`
       : content;
     
-    onProcess(fullContent, "Inserção manual");
+    try {
+      onLoadingChange(true);
+      const apiResult = await ApiService.processEmailText(fullContent);
+      const result: ClassificationData = {
+        ...apiResult,
+        originalContent: fullContent
+      };
+      onProcess(result);
+    } catch (error) {
+      toast({
+        title: "Erro ao processar email",
+        description: error instanceof Error ? error.message : "Erro desconhecido",
+        variant: "destructive"
+      });
+    } finally {
+      onLoadingChange(false);
+    }
   };
 
   const handleClear = () => {
@@ -112,9 +141,8 @@ export const EmailInput = ({ onProcess, isLoading, onReset }: EmailInputProps) =
         </div>
       </Card>
 
-      {/* Examples */}
       <Card className="p-6 border-card-border">
-        <h4 className="font-medium mb-4 text-muted-foreground">Exemplos para testar:</h4>
+        <h4 className="font-medium mb-4 text-muted-foreground">Exemplos:</h4>
         <div className="grid gap-3">
           {exampleEmails.map((example, index) => (
             <Button

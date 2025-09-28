@@ -103,7 +103,7 @@ class GeminiReplyGenerator:
         try:
             data = json.loads(out)
             cat = data.get("category", "").strip()
-            conf = float(data.get("confidence", 0.7))
+            conf = float(data.get("confidence", 0.65))
             if cat not in ("Produtivo", "Improdutivo"):
                 raise ValueError
             return cat, max(0.0, min(conf, 1.0))
@@ -111,4 +111,4 @@ class GeminiReplyGenerator:
             logger.warning("⚠ JSON inválido do Gemini; usando heurística simples.")
             t = raw_text.lower()
             cat = "Produtivo" if any(k in t for k in ["status","ticket","senha","fatura","erro","anexo","suporte"]) else "Improdutivo"
-            return cat, 0.7
+            return cat, 0.65

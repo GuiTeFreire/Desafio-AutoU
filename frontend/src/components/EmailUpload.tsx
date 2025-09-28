@@ -4,14 +4,25 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Upload, FileText, X, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ApiService } from "@/services/api";
 
-interface EmailUploadProps {
-  onProcess: (content: string, source: string) => void;
-  isLoading: boolean;
-  onReset: () => void;
+interface ClassificationData {
+  category: string;
+  confidence: number;
+  suggested_reply: string;
+  classify_source: string;
+  reply_source?: string;
+  originalContent: string;
 }
 
-export const EmailUpload = ({ onProcess, isLoading, onReset }: EmailUploadProps) => {
+interface EmailUploadProps {
+  onProcess: (result: ClassificationData) => void;
+  isLoading: boolean;
+  onReset: () => void;
+  onLoadingChange: (loading: boolean) => void;
+}
+
+export const EmailUpload = ({ onProcess, isLoading, onReset, onLoadingChange }: EmailUploadProps) => {
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -86,14 +97,21 @@ export const EmailUpload = ({ onProcess, isLoading, onReset }: EmailUploadProps)
     if (!file) return;
 
     try {
-      const content = await readFileContent(file);
-      onProcess(content, `Arquivo: ${file.name}`);
+      onLoadingChange(true);
+      const apiResult = await ApiService.processEmailFile(file);
+      const result: ClassificationData = {
+        ...apiResult,
+        originalContent: `Arquivo: ${file.name}`
+      };
+      onProcess(result);
     } catch (error) {
       toast({
         title: "Erro ao processar arquivo",
-        description: "Não foi possível ler o conteúdo do arquivo",
+        description: error instanceof Error ? error.message : "Erro desconhecido",
         variant: "destructive"
       });
+    } finally {
+      onLoadingChange(false);
     }
   };
 
@@ -128,6 +146,7 @@ export const EmailUpload = ({ onProcess, isLoading, onReset }: EmailUploadProps)
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
+          onClick={() => document.getElementById('file-upload')?.click()}
         >
           <div className="text-center">
             <div className="mb-4 flex justify-center">
@@ -152,8 +171,8 @@ export const EmailUpload = ({ onProcess, isLoading, onReset }: EmailUploadProps)
               id="file-upload"
             />
             <label htmlFor="file-upload">
-              <Button variant="outline" className="cursor-pointer">
-                Selecionar Arquivo
+              <Button variant="outline" className="cursor-pointer" asChild>
+                <span>Selecionar Arquivo</span>
               </Button>
             </label>
           </div>

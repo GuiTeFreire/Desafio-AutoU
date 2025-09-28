@@ -1,12 +1,8 @@
-"""
-Ponto de entrada principal para a API de classificação de emails.
-"""
 import sys
 from pathlib import Path
 
 from src.interfaces.api.app_factory import create_app
 
-# Adiciona o diretório src ao Python path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
@@ -20,10 +16,15 @@ if __name__ == "__main__":
     print("📖 Documentação em: http://localhost:8000/docs")
     print("🔍 Health check em: http://localhost:8000/health")
     
+    import os
+    
+    host = os.getenv("HOST", "127.0.0.1")
+    port = int(os.getenv("PORT", 8000))
+    
     uvicorn.run(
         app,
-        host="127.0.0.1",
-        port=8000,
+        host=host,
+        port=port,
         reload=False,
         log_level="info"
     )
