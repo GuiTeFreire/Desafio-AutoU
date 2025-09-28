@@ -19,3 +19,13 @@ def preprocess(text: str) -> str:
     text = clean_text(text).lower()
     tokens = [t for t in text.split() if t not in STOPWORDS_PT]
     return " ".join(tokens)
+
+BAD_WORDS = {
+    "arrombado","idiota","imbecil","merda","lixo","odiar","te odeio",
+    "vai se f*","vai se ferrar","desgraça","otário","otaria","burro","burra"
+    # ajuste conforme necessário
+}
+
+def is_toxic(text: str) -> bool:
+    t = text.lower()
+    return any(w in t for w in BAD_WORDS)

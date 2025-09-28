@@ -1,7 +1,7 @@
 from pathlib import Path
 import pickle
 from typing import Any
-from config.settings import settings
+from src.config.settings import settings
 
 class LocalModelStore:
     def __init__(self, model_dir: str | None = None, model_file: str | None = None):

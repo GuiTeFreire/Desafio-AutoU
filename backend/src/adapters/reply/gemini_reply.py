@@ -1,129 +1,114 @@
+# src/adapters/reply/gemini_reply.py
+import os
+import json
+import logging
 import google.generativeai as genai
-from typing import Optional
-from config.settings import settings
-from core.enums.category import Category
+from google.generativeai import GenerativeModel
+from dotenv import load_dotenv, find_dotenv
+
+# garante que o .env foi lido (também no subprocess do uvicorn --reload)
+load_dotenv(find_dotenv())
+
+logger = logging.getLogger("gemini_reply")
+logger.setLevel(logging.INFO)
+
+PREFERRED = [
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash-latest",
+    "gemini-1.5-pro-latest",
+]
+
+def _normalize_name(name: str) -> str:
+    return (name or "").strip().replace("models/", "")
+
+def _supports_generate_content(model) -> bool:
+    methods = getattr(model, "supported_generation_methods", None)
+    if isinstance(methods, (list, tuple, set)):
+        return "generateContent" in methods or "generate_content" in methods
+    return True
+
+def _configure_gemini():
+    # aceita GEMINI_API_KEY ou GOOGLE_API_KEY
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise RuntimeError("GEMINI_API_KEY/GOOGLE_API_KEY ausente no ambiente (.env).")
+    genai.configure(api_key=api_key)
+
+def _resolve_gemini_model_name() -> str:
+    _configure_gemini()
+    desired = _normalize_name(os.getenv("GEMINI_MODEL", "").strip())
+
+    available = list(genai.list_models())
+    names = {_normalize_name(m.name): m for m in available}
+
+    if desired:
+        m = names.get(desired)
+        if m and _supports_generate_content(m):
+            logger.info(f"✔ Usando modelo Gemini configurado: {desired}")
+            return desired
+        if not m and desired.endswith("-flash"):
+            alt = desired + "-latest"
+            if alt in names and _supports_generate_content(names[alt]):
+                logger.info(f"⚠ Modelo {desired} não encontrado; usando {alt}")
+                return alt
+        logger.warning(f"⚠ Modelo {desired} não suportado; tentando fallback.")
+
+    for cand in PREFERRED:
+        if cand in names and _supports_generate_content(names[cand]):
+            logger.info(f"✔ Usando modelo Gemini fallback: {cand}")
+            return cand
+
+    for m in available:
+        n = _normalize_name(m.name)
+        if _supports_generate_content(m):
+            logger.info(f"✔ Usando primeiro modelo válido encontrado: {n}")
+            return n
+
+    raise RuntimeError("Nenhum modelo Gemini disponível com generateContent.")
+
+def _gemini_model() -> GenerativeModel:
+    model_name = _resolve_gemini_model_name()
+    return GenerativeModel(model_name)
 
 class GeminiReplyGenerator:
     def __init__(self):
-        self.client = None
-        self._setup_client()
-    
-    def _setup_client(self):
-        """Configura o cliente Gemini"""
-        if not settings.GEMINI_API_KEY:
-            raise ValueError("GEMINI_API_KEY não configurada. Defina a variável de ambiente.")
-        
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        # Usa modelo mais estável e disponível
-        self.client = genai.GenerativeModel("gemini-1.5-flash")
-    
-    def _generate_classification_prompt(self, text: str) -> str:
-        """Gera prompt para classificação do email"""
-        return f"""
-Analise o seguinte email e classifique-o como "Produtivo" ou "Improdutivo":
+        self._model = None
 
-Email: "{text}"
+    def _model_instance(self) -> GenerativeModel:
+        if self._model is None:
+            self._model = _gemini_model()
+        return self._model
 
-Critérios:
-- PRODUTIVO: Solicitações, problemas técnicos, pedidos de ajuda, atualizações de status, reset de senha, faturas, relatórios, etc.
-- IMPRODUTIVO: Cumprimentos, agradecimentos genéricos, mensagens de felicitações, spam, etc.
-
-Responda APENAS com: "Produtivo" ou "Improdutivo"
-"""
-    
-    def _generate_reply_prompt(self, category: str, text: str) -> str:
-        """Gera prompt para criação de resposta automática"""
-        if category == Category.IMPRODUTIVO.value:
-            return f"""
-Email recebido: "{text}"
-
-Este email foi classificado como IMPRODUTIVO (cumprimento/agradecimento genérico).
-
-Gere uma resposta profissional e cordial, agradecendo e indicando que não há ação necessária.
-
-Responda em português brasileiro, de forma concisa e profissional.
-"""
-        else:
-            return f"""
-Email recebido: "{text}"
-
-Este email foi classificado como PRODUTIVO (solicitação que requer ação).
-
-Analise o conteúdo e gere uma resposta automática profissional que:
-1. Agradeça o contato
-2. Confirme o recebimento da solicitação
-3. Solicite informações adicionais se necessário
-4. Indique próximos passos
-5. Seja específica ao contexto da solicitação
-
-Tipos comuns de solicitações:
-- Status de chamado/ticket
-- Reset de senha/acesso
-- Fatura/segunda via
-- Anexos/documentos
-- Relatórios de erro
-- Solicitações gerais
-
-Responda em português brasileiro, de forma profissional e útil.
-"""
-    
-    def classify_email(self, text: str) -> tuple[str, float]:
-        """Classifica o email usando Gemini"""
-        try:
-            prompt = self._generate_classification_prompt(text)
-            response = self.client.generate_content(prompt)
-            
-            result = response.text.strip().lower()
-            confidence = 0.8  # Gemini não retorna confiança, usamos valor padrão
-            
-            if "produtivo" in result:
-                return Category.PRODUTIVO.value, confidence
-            else:
-                return Category.IMPRODUTIVO.value, confidence
-                
-        except Exception as e:
-            print(f"Erro na classificação Gemini: {e}")
-            # Fallback para classificação baseada em palavras-chave
-            return self._fallback_classification(text)
-    
-    def _fallback_classification(self, text: str) -> tuple[str, float]:
-        """Classificação de fallback baseada em palavras-chave"""
-        text_lower = text.lower()
-        
-        productive_keywords = [
-            "preciso", "solicito", "problema", "erro", "bug", "senha", "reset",
-            "acesso", "login", "fatura", "boleto", "pagamento", "chamado", "ticket",
-            "status", "andamento", "anexo", "arquivo", "documento", "relatório"
-        ]
-        
-        unproductive_keywords = [
-            "obrigado", "obrigada", "parabéns", "feliz", "natal", "ano novo",
-            "boas festas", "cumprimentos", "saudações"
-        ]
-        
-        productive_score = sum(1 for word in productive_keywords if word in text_lower)
-        unproductive_score = sum(1 for word in unproductive_keywords if word in text_lower)
-        
-        if productive_score > unproductive_score:
-            return Category.PRODUTIVO.value, 0.6
-        else:
-            return Category.IMPRODUTIVO.value, 0.6
-    
     def generate(self, category: str, original_text: str) -> str:
-        """Gera resposta automática usando Gemini"""
+        prompt = (
+            "Você é um assistente de atendimento de uma empresa do setor financeiro.\n"
+            f"Classificação do email: {category}.\n"
+            "Escreva uma resposta breve, clara e cordial em PT-BR, com tom profissional.\n"
+            "Se for Produtivo, agradeça, diga que analisará/atualizará o status e peça informações extras.\n"
+            "Se for Improdutivo, agradeça e diga que não há ação necessária.\n\n"
+            f"Email original (resuma discretamente, NÃO copie tudo):\n{original_text[:1200]}"
+        )
+        resp = self._model_instance().generate_content(prompt)
+        return (resp.text or "").strip()
+
+    def classify(self, raw_text: str) -> tuple[str, float]:
+        prompt = (
+            "Classifique o email como \"Produtivo\" ou \"Improdutivo\" e retorne JSON:\n"
+            "{\"category\":\"Produtivo|Improdutivo\",\"confidence\":0.xx}\n\n"
+            f"Email:\n{raw_text[:3000]}"
+        )
+        resp = self._model_instance().generate_content(prompt)
+        out = resp.text or ""
         try:
-            prompt = self._generate_reply_prompt(category, original_text)
-            response = self.client.generate_content(prompt)
-            return response.text.strip()
-            
-        except Exception as e:
-            print(f"Erro na geração de resposta Gemini: {e}")
-            # Fallback para resposta genérica
-            return self._fallback_reply(category)
-    
-    def _fallback_reply(self, category: str) -> str:
-        """Resposta de fallback caso Gemini falhe"""
-        if category == Category.IMPRODUTIVO.value:
-            return "Obrigado pela mensagem! Não há ação necessária no momento. Permanecemos à disposição."
-        else:
-            return "Olá! Obrigado pelo contato. Recebemos sua solicitação e vamos analisar os detalhes. Em breve retornaremos com próximos passos."
+            data = json.loads(out)
+            cat = data.get("category", "").strip()
+            conf = float(data.get("confidence", 0.7))
+            if cat not in ("Produtivo", "Improdutivo"):
+                raise ValueError
+            return cat, max(0.0, min(conf, 1.0))
+        except Exception:
+            logger.warning("⚠ JSON inválido do Gemini; usando heurística simples.")
+            t = raw_text.lower()
+            cat = "Produtivo" if any(k in t for k in ["status","ticket","senha","fatura","erro","anexo","suporte"]) else "Improdutivo"
+            return cat, 0.7

@@ -8,3 +8,5 @@ class ProcessEmailResponse(BaseModel):
     confidence: float
     suggested_reply: str
     classify_source: str
+    reply_source: str | None = None
+

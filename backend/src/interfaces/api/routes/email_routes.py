@@ -2,8 +2,8 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 from pypdf import PdfReader
 import io
 
-from interfaces.api.schemas import ProcessEmailResponse
-from use_cases.classify_email import ClassifyEmailUseCase, ClassifyEmailInput
+from src.interfaces.api.schemas import ProcessEmailResponse
+from src.use_cases.classify_email import ClassifyEmailUseCase, ClassifyEmailInput
 
 router = APIRouter(tags=["emails"])
 

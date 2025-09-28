@@ -1,4 +1,5 @@
-from core.enums.category import Category
+from src.adapters.nlp.preprocessing import is_toxic
+from src.core.enums.category import Category
 
 def detect_subtype(text: str) -> str:
     t = text.lower()
@@ -25,7 +26,18 @@ TEMPLATES = {
 
 class TemplateReplyGenerator:
     def generate(self, category: str, original_text: str) -> str:
+        print("Chegando aqui")
         if category == Category.IMPRODUTIVO.value:
+            # checa tóxico primeiro
+            if is_toxic(original_text):
+                return TEMPLATES["toxico"]
             return "Obrigado pela mensagem! Não há ação necessária no momento. Permanecemos à disposição."
         subtype = detect_subtype(original_text)
         return TEMPLATES.get(subtype, TEMPLATES["geral"])
+
+TEMPLATES["toxico"] = (
+  "Olá. Entendo que você esteja insatisfeito(a). "
+  "Para que possamos ajudar, por favor descreva o problema de forma objetiva "
+  "(ex.: número do chamado, erro observado, horário). "
+  "Seguimos à disposição para resolver a situação."
+)

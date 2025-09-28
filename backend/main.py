@@ -1,15 +1,14 @@
-#!/usr/bin/env python3
 """
 Ponto de entrada principal para a API de classificação de emails.
 """
 import sys
 from pathlib import Path
 
+from src.interfaces.api.app_factory import create_app
+
 # Adiciona o diretório src ao Python path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
-
-from interfaces.api.app_factory import create_app
 
 if __name__ == "__main__":
     import uvicorn

@@ -3,18 +3,23 @@ from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 
-from core.entities.email import Email
-from core.enums.category import Category
-from core.protocols.model_store import ModelStore
-from adapters.nlp.preprocessing import preprocess
+from src.core.entities.email import Email
+from src.core.enums.category import Category
+from src.core.protocols.model_store import ModelStore
+from src.adapters.nlp.preprocessing import preprocess
 
 # dataset semente para inicializar
 SEED = [
-    ("Preciso de atualização do chamado #1234.", Category.PRODUTIVO),
-    ("Poderiam resetar minha senha?", Category.PRODUTIVO),
+    ("Preciso de atualização do chamado", Category.PRODUTIVO),
+    ("Poderiam resetar minha senha", Category.PRODUTIVO),
     ("Segue em anexo o relatório solicitado.", Category.PRODUTIVO),
-    ("Obrigado pelo excelente trabalho!", Category.IMPRODUTIVO),
-    ("Feliz Natal! Boas festas a todos.", Category.IMPRODUTIVO),
+    ("eu te odeio", Category.IMPRODUTIVO),
+    ("seu atendimento é uma merda", Category.IMPRODUTIVO),
+    ("vocês são uns idiotas", Category.IMPRODUTIVO),
+    ("vai se ferrar", Category.IMPRODUTIVO),
+    ("lixo de empresa", Category.IMPRODUTIVO),
+    ("obrigado!", Category.IMPRODUTIVO),
+    ("feliz natal", Category.IMPRODUTIVO),
 ]
 
 class SklearnEmailClassifier:
