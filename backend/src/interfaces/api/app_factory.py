@@ -33,7 +33,13 @@ def create_app() -> FastAPI:
     store = LocalModelStore()
     classifier = SklearnEmailClassifier(store)
 
-    reply = GeminiReplyGenerator() if settings.AI_PROVIDER.lower() == "gemini" else TemplateReplyGenerator()
+    print(f"AI_PROVIDER configurado: {settings.AI_PROVIDER}")
+    if settings.AI_PROVIDER.lower() == "gemini":
+        print("Usando GeminiReplyGenerator")
+        reply = GeminiReplyGenerator()
+    else:
+        print("Usando TemplateReplyGenerator")
+        reply = TemplateReplyGenerator()
 
     uc = ClassifyEmailUseCase(classifier, reply)
     app.state.uc = uc

@@ -23,3 +23,4 @@ class Settings(BaseSettings):
     )
 
 settings = Settings()
+print(f"Settings carregadas - AI_PROVIDER: {settings.AI_PROVIDER}, ENV: {settings.ENV}")

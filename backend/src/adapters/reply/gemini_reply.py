@@ -32,7 +32,9 @@ def _configure_gemini():
     # aceita GEMINI_API_KEY ou GOOGLE_API_KEY
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
+        print("GEMINI_API_KEY/GOOGLE_API_KEY ausente no ambiente (.env).")
         raise RuntimeError("GEMINI_API_KEY/GOOGLE_API_KEY ausente no ambiente (.env).")
+    print(f"Configurando Gemini com API key: {api_key[:10]}...")
     genai.configure(api_key=api_key)
 
 def _resolve_gemini_model_name() -> str:
