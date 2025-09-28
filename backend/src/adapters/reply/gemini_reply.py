@@ -35,39 +35,49 @@ def _configure_gemini():
         print("GEMINI_API_KEY/GOOGLE_API_KEY ausente no ambiente (.env).")
         raise RuntimeError("GEMINI_API_KEY/GOOGLE_API_KEY ausente no ambiente (.env).")
     print(f"Configurando Gemini com API key: {api_key[:10]}...")
-    genai.configure(api_key=api_key)
+    try:
+        genai.configure(api_key=api_key)
+        print("Gemini configurado com sucesso")
+    except Exception as e:
+        print(f"Erro ao configurar Gemini: {e}")
+        raise
 
 def _resolve_gemini_model_name() -> str:
     _configure_gemini()
     desired = _normalize_name(os.getenv("GEMINI_MODEL", "").strip())
 
-    available = list(genai.list_models())
-    names = {_normalize_name(m.name): m for m in available}
+    try:
+        available = list(genai.list_models())
+        names = {_normalize_name(m.name): m for m in available}
 
-    if desired:
-        m = names.get(desired)
-        if m and _supports_generate_content(m):
-            logger.info(f"✔ Usando modelo Gemini configurado: {desired}")
-            return desired
-        if not m and desired.endswith("-flash"):
-            alt = desired + "-latest"
-            if alt in names and _supports_generate_content(names[alt]):
-                logger.info(f"⚠ Modelo {desired} não encontrado; usando {alt}")
-                return alt
-        logger.warning(f"⚠ Modelo {desired} não suportado; tentando fallback.")
+        if desired:
+            m = names.get(desired)
+            if m and _supports_generate_content(m):
+                logger.info(f"✔ Usando modelo Gemini configurado: {desired}")
+                return desired
+            if not m and desired.endswith("-flash"):
+                alt = desired + "-latest"
+                if alt in names and _supports_generate_content(names[alt]):
+                    logger.info(f"⚠ Modelo {desired} não encontrado; usando {alt}")
+                    return alt
+            logger.warning(f"⚠ Modelo {desired} não suportado; tentando fallback.")
 
-    for cand in PREFERRED:
-        if cand in names and _supports_generate_content(names[cand]):
-            logger.info(f"✔ Usando modelo Gemini fallback: {cand}")
-            return cand
+        for cand in PREFERRED:
+            if cand in names and _supports_generate_content(names[cand]):
+                logger.info(f"✔ Usando modelo Gemini fallback: {cand}")
+                return cand
 
-    for m in available:
-        n = _normalize_name(m.name)
-        if _supports_generate_content(m):
-            logger.info(f"✔ Usando primeiro modelo válido encontrado: {n}")
-            return n
+        for m in available:
+            n = _normalize_name(m.name)
+            if _supports_generate_content(m):
+                logger.info(f"✔ Usando primeiro modelo válido encontrado: {n}")
+                return n
 
-    raise RuntimeError("Nenhum modelo Gemini disponível com generateContent.")
+        raise RuntimeError("Nenhum modelo Gemini disponível com generateContent.")
+    except Exception as e:
+        print(f"Erro ao listar modelos Gemini: {e}")
+        # Fallback para modelo padrão
+        return "gemini-1.5-flash"
 
 def _gemini_model() -> GenerativeModel:
     model_name = _resolve_gemini_model_name()

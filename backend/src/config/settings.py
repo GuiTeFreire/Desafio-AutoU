@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     MODEL_DIR: str = "model_artifacts"
     MODEL_FILE: str = "clf_nb_tfidf.pkl"
 
-    AI_PROVIDER: str = "template"  # template | gemini
+    AI_PROVIDER: str = "gemini"  # template | gemini
 
     OPENAI_API_KEY: str | None = None
     OPENAI_MODEL: str = "gpt-4o-mini"

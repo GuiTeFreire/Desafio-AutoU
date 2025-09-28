@@ -10,7 +10,7 @@ services:
       - key: ENV
         value: prod
       - key: AI_PROVIDER
-        value: template
+        value: gemini
       - key: GEMINI_API_KEY
         sync: false
     healthCheckPath: /health
